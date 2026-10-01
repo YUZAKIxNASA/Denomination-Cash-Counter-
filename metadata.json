@@ -1,0 +1,6 @@
+{
+  "name": "Denomination (Cash Counter)",
+  "description": "Mobile-first cash denomination counter for Indian currency with instant calculation, breakdown, amount in words, save, share, and history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
