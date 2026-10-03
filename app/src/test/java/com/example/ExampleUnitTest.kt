@@ -17,6 +17,8 @@ class ExampleUnitTest {
         assertEquals("One Hundred Rupees Only", IndianCurrencyUtil.convertToWords(100L))
         assertEquals("One Thousand Rupees Only", IndianCurrencyUtil.convertToWords(1000L))
         assertEquals("Eight Thousand Seven Hundred Fifty Rupees Only", IndianCurrencyUtil.convertToWords(8750L))
+        assertEquals("Ten Thousand Rupees Only", IndianCurrencyUtil.convertToWords(10000L))
+        assertEquals("Five Thousand Seven Hundred Rupees Only", IndianCurrencyUtil.convertToWords(5700L))
         assertEquals("Ten Thousand Five Hundred Rupees Only", IndianCurrencyUtil.convertToWords(10500L))
         assertEquals("One Lakh Rupees Only", IndianCurrencyUtil.convertToWords(100000L))
         assertEquals("One Crore Rupees Only", IndianCurrencyUtil.convertToWords(10000000L))

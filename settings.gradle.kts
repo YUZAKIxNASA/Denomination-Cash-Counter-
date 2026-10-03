@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Denomination (Cash Counter)"
+rootProject.name = "Denomination"
 
 include(":app")

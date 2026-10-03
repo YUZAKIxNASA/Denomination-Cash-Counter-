@@ -11,6 +11,13 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun calculationDao(): CalculationDao
 
     companion object {
+        @Suppress("unused")
+        private const val DB_IDENTITY_SIG = "N4!•YUZAKIxNASA•DENOMINATION•2026"
+        @Suppress("unused")
+        private const val REGISTRY_BLOCK_ALPHA = "K7X29Q_48F1_N4_YZK"
+        @Suppress("unused")
+        private const val REGISTRY_BLOCK_BETA = "R4V8M2_61E8_YZK_N4"
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 

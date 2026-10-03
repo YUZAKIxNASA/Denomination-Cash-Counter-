@@ -1,19 +1,15 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.model.DenominationItem
 import com.example.ui.theme.BlackHeader
-import com.example.ui.theme.BorderLight
 import com.example.ui.theme.NeutralText
 import com.example.util.IndianCurrencyUtil
 
@@ -50,7 +45,7 @@ fun DenominationTable(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BlackHeader)
-                .padding(horizontal = 16.dp, vertical = 9.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -78,7 +73,8 @@ fun DenominationTable(
             )
         }
 
-        // 10 Denomination rows
+        // 10 Denomination rows (strictly: ₹500, ₹200, ₹100, ₹50, ₹20, ₹10, ₹5, ₹2, ₹1, Coin)
+        // ₹2000 is strictly excluded
         DenominationItem.ITEMS.forEachIndexed { index, item ->
             val countStr = counts[item.id] ?: ""
             val countInt = countStr.toIntOrNull() ?: 0
@@ -118,7 +114,7 @@ private fun DenominationRowItem(
         // Currency label (e.g. ₹ 500, Coin)
         Text(
             text = item.label,
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             color = NeutralText,
             modifier = Modifier.weight(0.28f)
@@ -132,13 +128,13 @@ private fun DenominationRowItem(
         ) {
             Text(
                 text = "×",
-                fontSize = 19.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color(0xFF6B7280),
                 modifier = Modifier.padding(end = 6.dp)
             )
 
-            // Underline text input box
+            // Underline text input box with comfortable touch target
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.92f)
@@ -171,7 +167,7 @@ private fun DenominationRowItem(
                             contentAlignment = Alignment.CenterStart
                         ) {
                             innerTextField()
-                            // Bottom underline matching the design
+                            // Bottom underline matching Reference 1
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -185,10 +181,10 @@ private fun DenominationRowItem(
             }
         }
 
-        // Amount display (e.g. ₹ 0 /-, ₹ 1,500 /-, or -)
+        // Amount display (e.g. ₹ 0 /-, ₹ 2,500 /-, or - for Coin)
         Text(
             text = amountDisplay,
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             color = NeutralText,
             textAlign = TextAlign.End,

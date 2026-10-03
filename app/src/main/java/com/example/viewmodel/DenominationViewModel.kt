@@ -56,8 +56,8 @@ class DenominationViewModel(application: Application) : AndroidViewModel(applica
     }
 
     private fun getCurrentDateTimeDisplay(): String {
-        // Matches the screenshot style: "Thu, 1 Oct 26, 01:40 pm"
-        val sdf = SimpleDateFormat("EEE, d MMM yy, hh:mm a", Locale.ENGLISH)
+        // Matches the format specified: "Tue, 29 Sep 2026, 12:47 PM"
+        val sdf = SimpleDateFormat("EEE, d MMM yyyy, hh:mm a", Locale.ENGLISH)
         return sdf.format(Date())
     }
 

@@ -4,7 +4,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,17 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,15 +46,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.data.CalculationRecord
 import com.example.ui.components.ClearConfirmDialog
 import com.example.ui.components.DenominationTable
 import com.example.ui.components.HistoryDialog
 import com.example.ui.components.SummarySection
 import com.example.ui.theme.BlackHeader
-import com.example.ui.theme.SubtleGrayBackground
 import com.example.ui.theme.WhiteBackground
 import com.example.viewmodel.DenominationViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -80,6 +79,15 @@ fun DenominationScreen(
     var showClearConfirm by remember { mutableStateOf(false) }
     var showHistoryDialog by remember { mutableStateOf(false) }
 
+    // Intercept back button if dialogs are visible
+    BackHandler(enabled = showHistoryDialog || showClearConfirm) {
+        if (showClearConfirm) {
+            showClearConfirm = false
+        } else if (showHistoryDialog) {
+            showHistoryDialog = false
+        }
+    }
+
     // Listen to toast / feedback events from ViewModel
     LaunchedEffect(Unit) {
         viewModel.toastEvents.collectLatest { message ->
@@ -87,7 +95,7 @@ fun DenominationScreen(
         }
     }
 
-    // Helper functions for sharing and clipboard
+    // Native sharing with clipboard fallback
     fun shareText(text: String) {
         try {
             val sendIntent: Intent = Intent().apply {
@@ -98,7 +106,6 @@ fun DenominationScreen(
             val shareIntent = Intent.createChooser(sendIntent, "Share Denomination Breakdown")
             context.startActivity(shareIntent)
         } catch (e: Exception) {
-            // Fallback to clipboard
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Denomination Breakdown", text)
             clipboard.setPrimaryClip(clip)
@@ -110,64 +117,96 @@ fun DenominationScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = SubtleGrayBackground,
+        containerColor = WhiteBackground,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = "Denomination (Cash Counter)",
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Column(
+                        modifier = Modifier.padding(vertical = 3.dp),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "DENOMINATION",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            softWrap = false
+                        )
+                        Text(
+                            text = "(CASH COUNTER)",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFE5E7EB),
+                            softWrap = false
+                        )
+                        Text(
+                            text = "@yuzaki_x_nasa | @ঔৣ፝ N4!",
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color(0xFF9CA3AF),
+                            softWrap = false
+                        )
+                    }
                 },
                 actions = {
                     // Save Button
                     IconButton(
                         onClick = { viewModel.saveCalculation() },
-                        modifier = Modifier.testTag("save_button")
+                        modifier = Modifier
+                            .size(38.dp)
+                            .testTag("save_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
-                            contentDescription = "Save Calculation",
-                            tint = Color.White
+                            contentDescription = "Save",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
                     // Share Button
                     IconButton(
                         onClick = { shareText(viewModel.getShareText()) },
-                        modifier = Modifier.testTag("share_button")
+                        modifier = Modifier
+                            .size(38.dp)
+                            .testTag("share_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Share,
-                            contentDescription = "Share Calculation",
-                            tint = Color.White
+                            contentDescription = "Share",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
                     // Clear Button
                     IconButton(
                         onClick = { showClearConfirm = true },
-                        modifier = Modifier.testTag("clear_button")
+                        modifier = Modifier
+                            .size(38.dp)
+                            .testTag("clear_button")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Clear Current Calculation",
-                            tint = Color.White
+                            contentDescription = "Clear",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
 
                     // History Button
                     IconButton(
                         onClick = { showHistoryDialog = true },
-                        modifier = Modifier.testTag("history_button")
+                        modifier = Modifier
+                            .size(38.dp)
+                            .testTag("history_button")
                     ) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
+                            imageVector = Icons.Default.History,
                             contentDescription = "History",
-                            tint = Color.White
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 },
@@ -179,11 +218,11 @@ fun DenominationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(SubtleGrayBackground),
+                .background(WhiteBackground),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Mobile-first content card with natural content height
-            // Centered on wide screens (desktop/tablet) with max width 480.dp
+            // Mobile-first natural content height column
+            // Centers on tablets/large screens up to 480.dp
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -193,7 +232,7 @@ fun DenominationScreen(
                     .padding(bottom = 16.dp)
                     .testTag("main_content_container")
             ) {
-                // Summary Section with live date, total notes/coins, total amount, and words
+                // Summary Section: Date & Time, Total Notes/Coins, Total Amount, Grand Total in Words
                 SummarySection(
                     dateTimeDisplay = currentDateTimeDisplay,
                     totalCount = totalCount,
@@ -201,16 +240,30 @@ fun DenominationScreen(
                     amountInWords = amountInWords
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // Denomination Table: Currency | Count | Amount
+                // Strictly 10 rows: ₹500, ₹200, ₹100, ₹50, ₹20, ₹10, ₹5, ₹2, ₹1, Coin
                 DenominationTable(
                     counts = counts,
                     onCountChange = { id, text -> viewModel.onCountChanged(id, text) }
                 )
 
-                // The container naturally ends right after the Coin row + normal bottom padding!
-                // No artificial spacers or excessive blank space.
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Bottom credit placed naturally near the bottom of the content (Section 11)
+                Text(
+                    text = "@yuzaki_x_nasa | @ঔৣ፝ N4!",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF9CA3AF),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("bottom_credit")
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
@@ -225,7 +278,7 @@ fun DenominationScreen(
             )
         }
 
-        // History Dialog / Sheet
+        // History Dialog
         if (showHistoryDialog) {
             HistoryDialog(
                 records = historyRecords,

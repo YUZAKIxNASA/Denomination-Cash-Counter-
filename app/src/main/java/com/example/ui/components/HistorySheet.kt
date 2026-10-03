@@ -16,12 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Visibility
@@ -33,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -70,6 +67,7 @@ fun HistoryDialog(
     onDismiss: () -> Unit
 ) {
     var selectedRecordForDetail by remember { mutableStateOf<CalculationRecord?>(null) }
+    var recordToDelete by remember { mutableStateOf<CalculationRecord?>(null) }
     var showClearAllConfirm by remember { mutableStateOf(false) }
 
     Dialog(
@@ -97,7 +95,7 @@ fun HistoryDialog(
                                 modifier = Modifier.testTag("history_back_button")
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowBack,
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Back",
                                     tint = Color.White
                                 )
@@ -172,7 +170,7 @@ fun HistoryDialog(
                                         onDismiss()
                                     },
                                     onShare = { onShareRecord(record) },
-                                    onDelete = { onDeleteRecord(record) }
+                                    onDeleteRequest = { recordToDelete = record }
                                 )
                             }
                         }
@@ -196,12 +194,42 @@ fun HistoryDialog(
                 )
             }
 
+            // Single Record Delete Confirm Dialog
+            recordToDelete?.let { record ->
+                AlertDialog(
+                    onDismissRequest = { recordToDelete = null },
+                    title = {
+                        Text("Delete this record?", fontWeight = FontWeight.Bold)
+                    },
+                    text = {
+                        Text("This calculation from ${record.formattedDate} will be permanently removed.")
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                val toDelete = recordToDelete
+                                recordToDelete = null
+                                if (toDelete != null) onDeleteRecord(toDelete)
+                            },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFDC2626))
+                        ) {
+                            Text("Delete", fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { recordToDelete = null }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
+            }
+
             // Clear All Confirm Dialog
             if (showClearAllConfirm) {
                 AlertDialog(
                     onDismissRequest = { showClearAllConfirm = false },
                     title = {
-                        Text("Clear All History?", fontWeight = FontWeight.Bold)
+                        Text("Clear all history?", fontWeight = FontWeight.Bold)
                     },
                     text = {
                         Text("Are you sure you want to delete all saved calculations? This action cannot be undone.")
@@ -234,7 +262,7 @@ private fun HistoryCardItem(
     onViewDetail: () -> Unit,
     onLoad: () -> Unit,
     onShare: () -> Unit,
-    onDelete: () -> Unit
+    onDeleteRequest: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -337,7 +365,7 @@ private fun HistoryCardItem(
 
                 // Delete
                 IconButton(
-                    onClick = onDelete,
+                    onClick = onDeleteRequest,
                     modifier = Modifier.testTag("delete_${record.id}")
                 ) {
                     Icon(
